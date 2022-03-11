@@ -1,78 +1,107 @@
-class AFN:
-    # Função construtora da classe AFN
+class APN:
+    # Função construtora da classe APN
     def __init__(self):
         self.estados = []
         self.simbolos = []
         self.alfabetoPilha = []
         self.mapa = dict()
-        self.palavras = []
+        self.palavrasTeste = []
         self.estadosFinais = []
-        self.estadoInicial = str
-        self.pilha = []
+        self.pilhaTransicoes = []
+        self.estadoInicial = ''
 
-    # Cria um dicionário (mapa em python) para armazenar as transições do AFN
-    def preencheDic(self):
-        #recebe o número de transições
-        num_transicoes = int(input())
+    def criaMapa(self, transicoes):
+        tripla = transicoes[0]+transicoes[1]+transicoes[2]
+        if(tripla in self.mapa):
+            self.mapa[tripla] = self.mapa[tripla] + [[transicoes[3], transicoes[4]]]
+        else:
+            novaTransicao = {transicoes[0]+transicoes[1]+transicoes[2]:[[transicoes[3], transicoes[4]]]}
+            self.mapa.update(novaTransicao)
 
-        for i in range (0, num_transicoes):
+    def leTransicoes(self, num):
+        for i in range(0, num):
             transicoes = input().split()
-            trans = transicoes[0]+transicoes[1]
-            if(trans in self.mapa):
-                self.mapa[trans] = self.mapa[trans] + [transicoes[2]] 
-            else:
-                novaTransicao = {transicoes[0]+transicoes[1]:[transicoes[2]]}
-                self.mapa.update(novaTransicao)
-
-    # Percorre a palavra a partir do seu estado inicial
-    def lePalavra(self, palavra, estadoInicial):
-        self.pilha = [estadoInicial]
-        for char in palavra:
-            novaPilha = []
-            for estado in self.pilha:
-                if ((estado + char) in self.mapa):
-                    proximoEstado = self.mapa.get(estado+char)
-                else:
-                    proximoEstado = False
-
-                if(proximoEstado):
-                    for estado in proximoEstado:
-                        novaPilha.append(estado)
-            self.pilha = novaPilha
+            self.criaMapa(transicoes)
         
-        self.aceitaPalavra()
+    def validaTransicoes(self, estadoAtual, palavra, pilha, pilhaTransicoes):
+        carConsumido = palavra[0:1]
+        simTopoPilha = pilha[0:1]
+
+        if((estadoAtual+carConsumido+simTopoPilha) in self.mapa):
+            duplas = self.mapa.get(estadoAtual+carConsumido+simTopoPilha)
+            for dupla in duplas:
+                pilhaTransicoes.append([dupla[0], self.consomeSim(palavra), self.empilhaSim(self.consomeSim(pilha), dupla[1])])
+        
+        if( (estadoAtual+'*'+simTopoPilha) in self.mapa ):
+          duplas = self.mapa.get(estadoAtual+'*'+simTopoPilha)
+          for dupla in duplas:
+            pilhaTransicoes.append([dupla[0], palavra, self.empilhaSim(self.consomeSim(pilha), dupla[1])])
+
+        if((estadoAtual+carConsumido+'*') in self.mapa):
+          duplas = self.mapa.get(estadoAtual+carConsumido+'*')
+          for dupla in duplas:
+            pilhaTransicoes.append([dupla[0], self.consomeSim(palavra), self.empilhaSim(pilha, dupla[1]) ])
+
+        if((estadoAtual+'**') in self.mapa):
+          duplas = self.mapa.get(estadoAtual+'**')
+          for dupla in duplas:
+            pilhaTransicoes.append([dupla[0], palavra, self.empilhaSim(pilha, dupla[1])])
     
-    # Escreve 'S' se a palavra for aceita e 'N' se a apalvra não for aceita pelo AFN
-    def aceitaPalavra(self):
-        ehAceita = False
-        for estado in self.pilha:
-            if(estado in self.estadosFinais):
-                ehAceita = True
+    def consomeSim(self, string):
+         return string[1:len(string)]
+
+    def empilhaSim(self, pilha, string):
+        if(string == '*'):
+            return pilha
+        else:
+            return string+pilha
+    
+    def ehAceito(self, estado, palavra, pilhaSim):
+        if(len(palavra)==0 and len(pilhaSim)==0 and estado in self.estadosFinais):
+            return True
+        else:
+            return False
+
+    def consomePilhaTransicoes(self, palavra, estadoInicial):
+        self.pilhaTransicoes = [[estadoInicial, palavra, '']]
+        aceita = False
+        while (not (len(self.pilhaTransicoes)==0)):
+            novaPilhaTransicoes = []
+
+            for pilha in self.pilhaTransicoes:  
+              self.validaTransicoes(pilha[0], pilha[1], pilha[2], novaPilhaTransicoes)
+              if(self.ehAceito(pilha[0], pilha[1], pilha[2])):
+                aceita = True
                 break
-    
-        if(ehAceita):
+
+            if(aceita):
+              break
+            self.pilhaTransicoes = novaPilhaTransicoes
+       
+        
+        if(aceita):
             print('S')
         else:
             print('N')
 
-# Testa as palavras presentes no array palavras
-def testaPalavra(L):
-    for palavra in L.palavras:
-        L.lePalavra(palavra, L.estadoInicial)
+def testaAPN(P):
+    for palavras in P.palavrasTeste:
+        P.consomePilhaTransicoes(palavras, P.estadoInicial)
 
-# Cria um novo objeto da classe linguagem e preenche seus atributos com parâmetros definitos pelo usuário
-def criaAFN():
 
-    L = AFN()
+def criaAPN():
+    P = APN()
+    P.estados = input()
+    P.simbolos = input()
+    P.alfabetoPilha = input()
+    numeroTransicoes = int(input())
+    P.leTransicoes(numeroTransicoes)
+    P.estadoInicial = input()
+    P.estadosFinais = input().split()
+    P.palavrasTeste = input().split()
 
-    L.estados = input()
-    L.simbolos = input()
-    L.preencheDic()
-    L.estadoInicial = input()
-    L.estadosFinais = input().split()
-    L.palavras = input().split()
-    return L
+    return P
 
-novaL = criaAFN()
-testaPalavra(novaL)
+novoAPN = criaAPN()
+testaAPN(novoAPN)
 
