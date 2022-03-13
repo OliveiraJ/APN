@@ -1,6 +1,3 @@
-import json
-
-
 class APN:
     # Função construtora da classe APN
     def __init__(self):
@@ -23,9 +20,9 @@ class APN:
                              transicoes[2]: [[transicoes[3], transicoes[4]]]}
             self.mapa.update(novaTransicao)
 
-    def leTransicoes(self, num, data):
+    def leTransicoes(self, num):
         for i in range(0, num):
-            transicoes = data["quintuplas"][i].split()
+            transicoes = input().split()
             self.criaMapa(transicoes)
 
     def validaTransicoes(self, estadoAtual, palavra, pilha, pilhaTransicoes):
@@ -94,30 +91,21 @@ class APN:
             print('N')
 
 
-def lerData():
-    fData = open('data.json')
-    data = json.load(fData)
-    fData.close()
-    return data
-
-
 def testaAPN(P):
     for palavras in P.palavrasTeste:
         P.consomePilhaTransicoes(palavras, P.estadoInicial)
 
 
 def criaAPN():
-    data = lerData()
-
     P = APN()
-    P.estados = data["estados"]
-    P.simbolos = data["simbolos"]
-    P.alfabetoPilha = data["alfabetoPilha"]
-    numeroTransicoes = int(data["numTransicoes"])
-    P.leTransicoes(numeroTransicoes, data)
-    P.estadoInicial = data["estadoInicial"]
-    P.estadosFinais = data["estadosFinais"].split()
-    P.palavrasTeste = data["palavrasTeste"].split()
+    P.estados = input()
+    P.simbolos = input()
+    P.alfabetoPilha = input()
+    numeroTransicoes = int(input())
+    P.leTransicoes(numeroTransicoes)
+    P.estadoInicial = input()
+    P.estadosFinais = input().split()
+    P.palavrasTeste = input().split()
 
     return P
 
