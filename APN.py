@@ -1,6 +1,7 @@
 import json
 import time
 
+
 test_res = []
 media = []
 
@@ -104,6 +105,8 @@ def lerData():
     fData.close()
     return data
 
+# adapatada para testes de performace
+
 
 def testaAPN(P):
     i = 0
@@ -114,7 +117,6 @@ def testaAPN(P):
         if(len(test_res) != len(P.palavrasTeste)):
             test_res.append(fim-inicio)
         else:
-            # print(i)
             test_res[i] = test_res[i]+(fim-inicio)
         i = 1+i
 
@@ -137,7 +139,7 @@ def criaAPN():
 
 novoAPN = criaAPN()
 
-for j in range(10000):
+for t in range(10000):
     testaAPN(novoAPN)
 
 for res in test_res:
