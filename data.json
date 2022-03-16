@@ -6,5 +6,5 @@
 	"quintuplas": ["0 a * 0 A", "0 * * 1 *", "1 b A 1 *"],
 	"estadoInicial": "0",
 	"estadosFinais": "1",
-	"palavrasTeste": "* ab ba abb aab"
+	"palavrasTeste": "* ab ba abb aab aba"
 }

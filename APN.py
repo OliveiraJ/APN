@@ -1,4 +1,8 @@
 import json
+import time
+
+test_res = []
+media = []
 
 
 class APN:
@@ -88,10 +92,10 @@ class APN:
                 break
             self.pilhaTransicoes = novaPilhaTransicoes
 
-        if(aceita):
-            print('S')
-        else:
-            print('N')
+        # if(aceita):
+        #     print('S')
+        # else:
+        #     print('N')
 
 
 def lerData():
@@ -102,8 +106,17 @@ def lerData():
 
 
 def testaAPN(P):
+    i = 0
     for palavras in P.palavrasTeste:
+        inicio = time.time()
         P.consomePilhaTransicoes(palavras, P.estadoInicial)
+        fim = time.time()
+        if(len(test_res) != len(P.palavrasTeste)):
+            test_res.append(fim-inicio)
+        else:
+            # print(i)
+            test_res[i] = test_res[i]+(fim-inicio)
+        i = 1+i
 
 
 def criaAPN():
@@ -123,4 +136,11 @@ def criaAPN():
 
 
 novoAPN = criaAPN()
-testaAPN(novoAPN)
+
+for j in range(10000):
+    testaAPN(novoAPN)
+
+for res in test_res:
+    media.append(res/1000)
+
+print(media)
